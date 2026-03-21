@@ -1,0 +1,412 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <cstdlib>
+#include <windows.h>
+
+using namespace std;
+
+//const and global variables
+const int max_pet = 100;
+const int petAttri = 5;
+const int name = 0, type = 1, age = 2, fee = 3, stat = 4;
+int petCount = 15;
+string user = "Guest";
+
+//FUNCTION TEMPLATE
+template <typename T>
+int findIndex(T arr[][petAttri], int size, int col, T key){
+    for(int i = 0; i < size; i++) {
+        if (arr[i][col] == key)
+            return i;
+    }
+    return -1;
+}
+
+//FUNCTION OVERLOAD + COMPUTATION OF FEE
+double comFee(double fee){
+    return fee;
+}
+
+double comFee(double fee, double addOn){
+    return fee + addOn;
+}
+
+double comFee(double fee, double vax, double grooming){
+    return fee + vax + grooming;
+}
+
+//function declaration
+template <typename T>
+int findIndex(T arr[][petAttri], int size, int col, T key);
+
+double comFee(double fee);
+double comFee(double fee, double addOn);
+double comFee(double fee, double vax, double grooming);
+
+void viewAllPets(string pets[][petAttri], int count);
+void adoptPet(string pets[][petAttri], int count);
+bool computeAdoptionFee(string pets[][petAttri], int idx, int count);
+void countAvailablePets(string pets[][petAttri], int count);
+
+void printLine(char line = '-', int l = 60);
+void mabuhay();
+void header();
+void welcome();
+void setcolor(int c);
+void redtext();
+void greentext();
+void yellowtext();
+void bluetext();
+void purpletext();
+void resettext();
+
+// array of pets
+string pets[max_pet][petAttri] = {
+    {"Tofee", "Cat", "1", "2000", "Available"},
+    {"Cookie", "Dog", "1", "1000", "Available"},
+    {"Pippo", "Cat", "3", "900", "Available"},
+    {"Esther", "Cat", "2", "850", "Available"},
+    {"Smiley", "Dog", "1", "500", "Available"},
+    {"Shadow", "Dog", "2", "950", "Available"},
+    {"Tiki", "Cat", "1", "500", "Available"},
+    {"Vicky", "Cat", "4", "1500", "Available"},
+    {"Jas", "Cat", "0", "550", "Available"},
+    {"Simba", "Dog", "3", "2800", "Available"},
+    {"Tiamo", "Cat","5", "1800", "Available"},
+    {"Dasurv", "Cat", "3", "850", "Available"},
+    {"Ziggy", "Dog", "1", "1200", "Available"},
+    {"Keri", "Dog",  "2", "1000", "Available"},
+    {"Tortilla", "Cat", "5", "2000", "Available"}
+};
+
+int main(){
+    mabuhay();
+    int choice = 0;
+
+    do {
+        system("cls");
+
+        yellowtext();
+        cout << R"(
+       _____ _____ _ _ _     _____ _____ _____ _____
+      |  _  |  _  | | | |___|   __|   __|     |_   _|
+      |   __|     | | | |___|   __|   __|   --| | |
+      |__|  |__|__|_____|   |__|  |_____|_____| |_|)" << endl;
+
+        resettext();
+        header();
+        welcome();
+
+        bluetext();
+        cout << "         > MAIN MENU\n";
+        resettext();
+        printLine();
+        cout << "         [1] Adopt a Paw\n"
+             << "         [2] Status Summary\n"
+             << "         [3] Exit\n";
+
+        yellowtext();
+        cout << "> ";
+        if (!(cin >> choice)){
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+        cin.ignore();
+
+        switch (choice) {
+            case 1:
+                adoptPet(pets, petCount);
+            break;
+            case 2:
+                system("cls");
+                header();
+                countAvailablePets(pets, petCount);
+                system("pause");
+            break;
+            case 3:
+                system("cls");
+                header();
+                yellowtext();
+                cout << "\n  You're PAWsome, " << user << "! Thanks for helping pets find\n  their forever home.\n\n";
+                bluetext();
+cout << R"(  /^ ^\
+ / 0 0 \
+ V\ Y /V
+  / - \
+ /    |
+V__ ||)" << endl;
+            resettext();
+
+            break;
+        default:
+            cout << "\n[!] Invalid choice.\n";
+            Sleep(1000);
+            system("cls");
+        }
+
+    } while (choice != 3);
+
+    return 0;
+}
+
+//user-def function
+void viewAllPets(string pets[][petAttri], int count){
+    system("cls");
+    header();
+
+    cout << "They've been waiting. You've been looking. Let's make it pawfect!\n";
+    printLine();
+
+    bluetext();
+    cout << left << setw(5) << "#" << setw(15) << "Name" << setw(15) << "Type"
+         << setw(8) << "Age" << setw(12) << "Fee" << "Status" << endl;
+    resettext();
+    printLine();
+
+    for (int i = 0; i < count; i++){
+        if(pets[i][stat] == "Adopted")
+            redtext();
+        else yellowtext();
+        cout << left << setw(5) << (i + 1)
+             << setw(15) << pets[i][name]
+             << setw(15) << pets[i][type]
+             << setw(8) << (pets[i][age] + " y")
+             << setw(12) << pets[i][fee]
+             << pets[i][stat] << endl;
+    }
+
+    resettext();
+    printLine();
+
+}
+
+void adoptPet(string pets[][petAttri], int count){
+    system("cls");
+    header();
+    welcome();
+    viewAllPets(pets, petCount);
+
+    yellowtext();
+    cout << "\n[ADOPT A PAW]\n";
+    resettext();
+
+    printLine('.');
+    cout << "Enter Paw Number or Paw Name:\n";
+    yellowtext();
+    cout << "   > ";
+    string input;
+    getline(cin, input);
+    int idx = -1;
+
+    if (!input.empty() && isdigit(input[0])){
+        int num = stoi(input);
+        idx = num - 1;
+    } else {
+        idx = findIndex(pets, count, name, input);
+    }
+
+    if (idx < 0 || idx >= count) {
+        redtext();
+        cout << "\n[!] Invalid selection or pet not found.\n"
+             << "   Returning you to the Main Menu...\n";
+        resettext();
+        Sleep(3000);
+        return;
+    }
+
+    if (pets[idx][stat] == "Available") {
+        bool confirmed = computeAdoptionFee(pets, idx, count);
+
+        if (confirmed) {
+            pets[idx][stat] = "Adopted";
+            greentext();
+            cout << "\n[SUCCESS] Congratulations! " << pets[idx][name] << " is now yours.\n\n";
+            resettext();
+        } else {
+            yellowtext();
+            cout << "\n[INFO] Adoption cancelled. " << pets[idx][name] << " is still available.\n\n";
+            resettext();
+         }
+
+        Sleep(2000);
+
+    } else {
+        redtext();
+        cout << "\n[!] Sorry, " << pets[idx][name] << " is already adopted.\n";
+        resettext();
+        Sleep(1500);
+    }
+}
+
+bool computeAdoptionFee(string pets[][petAttri], int idx, int petCount){
+    if (idx < 0 || idx >= petCount)
+        return false;
+
+    const double vaccinationFee = 550.0;
+    const double groomingFee = 1350.0;
+    string petName = pets[idx][name];
+    string petType = pets[idx][type];
+    double baseFee = stod(pets[idx][fee]);
+
+    system("cls");
+    header();
+
+    cout << "They've been waiting. You've been looking. Let's make it pawfect!\n";
+    printLine();
+
+    yellowtext();
+    cout << "\n[ADOPTION DETAILS FOR " << petName << " (" << petType << ")]\n";
+    resettext();
+
+    printLine();
+    cout << "Base Adoption Fee: PHP " << fixed << setprecision(2) << baseFee << endl;
+
+    cout << "\nInclude vaccination? (PHP " << vaccinationFee << ")\n"
+         << "[1] Yes  [2] No: ";
+    int vaxChoice;
+    cin >> vaxChoice;
+
+    cout << "\nInclude grooming? (PHP " << groomingFee << ")\n"
+         << "[1] Yes  [2] No: ";
+    int groomChoice;
+    cin >> groomChoice;
+    printLine();
+    cout << endl;
+
+    double vaccination = (vaxChoice == 1) ? vaccinationFee : 0;
+    double grooming = (groomChoice == 1) ? groomingFee : 0;
+
+    double total;
+    if (vaxChoice == 1 && groomChoice == 1) {
+        total = comFee(baseFee, vaccination, grooming);
+    }
+    else if (vaxChoice == 1) {
+        total = comFee(baseFee, vaccination);
+    }
+    else if (groomChoice == 1) {
+        total = comFee(baseFee, grooming);
+    }
+    else {
+        total = comFee(baseFee);
+    }
+
+    yellowtext();
+    cout << "********** [ADOPTION CONFIRMATION SLIP BREAKDOWN] **********\n";
+    resettext();
+    cout << "Base Fee     : PHP " << baseFee << endl;
+    if (vaccination > 0)
+        cout << "Vaccination  : PHP " << vaccination << endl;
+    if (grooming > 0)
+        cout << "Grooming     : PHP " << grooming << endl;
+    printLine();
+    greentext();
+    cout << "TOTAL FEE    : PHP " << total << endl;
+    resettext();
+
+    cout << "\nDo you want to adopt " << petName << "? (y/n): ";
+    char confirm;
+    cin >> confirm;
+    cin.ignore();
+
+    return (confirm == 'y' || confirm == 'Y');
+}
+
+ void countAvailablePets(string pets[][petAttri], int count){
+    int avail = 0;
+
+    for (int i = 0; i < count; i++) {
+        if (pets[i][stat] == "Available") avail++;
+    }
+    int first = findIndex(pets, count, stat, (string) "Available");
+
+    greentext();
+    cout << "\n[STATUS SUMMARY]\n";
+    resettext();
+    cout << "  Total pets       : " << count << "\n";
+    cout << "  Available        : " << avail << "\n";
+    cout << "  Adopted          : " << (count - avail) << "\n";
+    printLine('.');
+
+    if (first != -1) {
+        yellowtext();
+        cout << "  Next available   : Pet #" << (first + 1) << " ("
+             << pets[first][name] << " - " << pets[first][type] << ")\n";
+        resettext();
+
+    } else {
+        redtext();
+        cout << "  Next available   : None (All pets adopted!)\n";
+        resettext();
+    }
+    printLine();
+}
+
+//function for designing
+void mabuhay(){
+    system("cls");
+    header();
+
+    yellowtext();
+    cout << "\n    WELCOME TO PAWFECT MATCH! <3\n";
+    resettext();
+
+    cout << "    Before we begin, what should we call you?\n\n";
+    yellowtext();
+    cout << "        > ";
+    getline(cin, user);
+
+    bluetext();
+    cout << "\n    PAWcessing...";
+    Sleep(1500);
+}
+
+void header(){
+    bluetext();
+    printLine('.');
+    yellowtext();
+    cout << "              PAWFECT MATCH - ADOPT A PAW!\n";
+    bluetext();
+    printLine('.');
+    resettext();
+}
+
+void welcome(){
+    cout << "     Welcome, " << user << "! your fur-ever starts here :)\n";
+
+    yellowtext();
+    cout << "They've been waiting. You've been looking. Let's make it pawfect!\n";
+    resettext();
+    printLine('.');
+    cout << endl;
+}
+
+void printLine(char line, int l){
+    for(int i = 0; i < l; i++)
+        cout << line;
+        cout << endl;
+}
+
+void setcolor(int c){
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(h, c);
+}
+void redtext(){
+    setcolor(12);
+}
+void greentext(){
+    setcolor(10);
+}
+void yellowtext(){
+    setcolor(14);
+}
+void bluetext(){
+    setcolor(9);
+}
+void purpletext(){
+    setcolor(13);
+}
+void resettext(){
+    setcolor(7);
+}
