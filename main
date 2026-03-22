@@ -81,12 +81,26 @@ string pets[max_pet][petAttri] = {
 };
 
 int main(){
+    yellowtext();
+        cout << R"(
+       _____ _____ _ _ _     _____ _____ _____ _____
+      |  _  |  _  | | | |___|   __|   __|     |_   _|
+      |   __|     | | | |___|   __|   __|   --| | |
+      |__|  |__|__|_____|   |__|  |_____|_____| |_|)" << endl;
+
+    bluetext();
+    printLine('.');
+    yellowtext();
+    cout << "           PAWcessing your fur-ever match...\n";
+    bluetext();
+    printLine('.');
+    Sleep(2000);
+
     mabuhay();
     int choice = 0;
 
     do {
         system("cls");
-
         yellowtext();
         cout << R"(
        _____ _____ _ _ _     _____ _____ _____ _____
